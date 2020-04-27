@@ -69,6 +69,20 @@ int main (int argc, char *argv[] )  {
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
 
+  if (size == 1) {
+    printf("Running sequential version\n");
+    double start_time_sequential, end_time_sequential;
+    start_time_sequential = MPI_Wtime();
+    rgb_sequential = julia_set_sequential ( w, h, cnt, xl, xr, yb, yt );
+    end_time_sequential = MPI_Wtime();
+    printf("Sequential time: %2.3f\n", end_time_sequential - start_time_sequential);
+    fflush(stdout);
+    tga_write ( w, h, rgb_sequential, filename );
+    free ( rgb_sequential );
+    free ( rgb_parallel );
+
+  } else {
+
   double start_time_parallel, end_time_parallel;
 
   if(rank == MASTER) {
@@ -189,7 +203,7 @@ int main (int argc, char *argv[] )  {
     free ( rgb_sequential );
     free ( rgb_parallel );
   }
-
+  }
   MPI_Finalize();
 
   return 0;
