@@ -308,8 +308,8 @@ void dosharpen_sequential(char *infile, int nx, int ny)
   
   //printf("... done\n");
   //printf("\n");
-  printf("Sequential calculation time : %f seconds\n", time);
-  fflush(stdout);
+  //printf("Sequential calculation time : %f seconds\n", time);
+  //fflush(stdout);
 
   free(fuzzy);
   free(fuzzyPadded);
