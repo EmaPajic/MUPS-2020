@@ -493,19 +493,14 @@ int main (int argc, char* argv[]){
 
   int gridNumElems = params.gridSize[0]*params.gridSize[1]*params.gridSize[2];
 
-  cmplx* gridData_sequential = (cmplx*) calloc (gridNumElems, sizeof(cmplx)); 
-  float* sampleDensity_sequential = (float*) calloc (gridNumElems, sizeof(float)); 
-  cmplx* gridData_parallel = (cmplx*) calloc (gridNumElems, sizeof(cmplx)); 
-  float* sampleDensity_parallel = (float*) calloc (gridNumElems, sizeof(float)); 
+  cmplx* gridData_sequential = NULL;
+  float* sampleDensity_sequential = NULL;
+  cmplx* gridData_parallel = NULL;
+  float* sampleDensity_parallel = NULL; 
 
   if(rank == MASTER) {
     if (samples == NULL){
       printf("ERROR: Unable to allocate memory for input data\n");
-      exit(1);
-    }
-
-    if (sampleDensity_sequential == NULL || sampleDensity_parallel == NULL || gridData_sequential == NULL || gridData_parallel == NULL){
-      printf("ERROR: Unable to allocate memory for output data\n");
       exit(1);
     }
 
@@ -541,13 +536,31 @@ int main (int argc, char* argv[]){
   if(rank == MASTER) {
     time_begin_parallel = MPI_Wtime();
   }
-  
+
+  gridData_parallel = (cmplx*) calloc (gridNumElems, sizeof(cmplx)); 
+  sampleDensity_parallel = (float*) calloc (gridNumElems, sizeof(float));
+
+  if (sampleDensity_parallel == NULL || gridData_parallel == NULL){
+      printf("ERROR: Unable to allocate memory for output data\n");
+      exit(1);
+  }
+
   gridding_Gold_parallel(n, params, samples, LUT, sizeLUT, gridData_parallel, sampleDensity_parallel);
 
   if(rank == MASTER) {
     time_end_parallel = MPI_Wtime();
 
+
+
     time_begin_sequential = MPI_Wtime();
+    gridData_sequential = (cmplx*) calloc (gridNumElems, sizeof(cmplx)); 
+    sampleDensity_sequential = (float*) calloc (gridNumElems, sizeof(float));
+
+    if (sampleDensity_sequential == NULL || gridData_sequential == NULL){
+      printf("ERROR: Unable to allocate memory for output data\n");
+      exit(1);
+    } 
+    
     gridding_Gold_sequential(n, params, samples, LUT, sizeLUT, gridData_sequential, sampleDensity_sequential);
     time_end_sequential = MPI_Wtime();
   
